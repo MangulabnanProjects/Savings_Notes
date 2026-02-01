@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'screens/home_screen.dart';
+import 'screens/splash_screen.dart';
 
 void main() {
   runApp(const SavingsTipCalendarApp());
@@ -76,7 +76,7 @@ class SavingsTipCalendarApp extends StatelessWidget {
         }
         return child!;
       },
-      home: const HomeScreen(),
+      home: const SplashScreen(),
     );
   }
 }

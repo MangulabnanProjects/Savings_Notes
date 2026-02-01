@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../widgets/app_drawer.dart';
+import '../services/storage_service.dart';
+import 'home_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   final Map<String, List<dynamic>> entries;
@@ -8,7 +10,7 @@ class DashboardScreen extends StatefulWidget {
 
   const DashboardScreen({
     super.key,
-    required this.entries,
+    this.entries = const {},
     required this.focusedMonth,
   });
 
@@ -18,11 +20,36 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   late DateTime _focusedMonth;
+  Map<String, List<dynamic>> _entries = {};
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
     _focusedMonth = widget.focusedMonth;
+    _loadEntries();
+  }
+
+  Future<void> _loadEntries() async {
+    final savedEntries = await StorageService.loadEntries();
+    
+    // Convert to the correct format with Entry objects
+    final Map<String, List<dynamic>> convertedEntries = {};
+    savedEntries.forEach((key, entryList) {
+      convertedEntries[key] = entryList.map((e) => Entry(
+        amount: (e['amount'] as num).toDouble(),
+        description: e['description'] as String,
+        isSavings: e['isSavings'] as bool,
+        timestamp: DateTime.parse(e['timestamp'] as String),
+      )).toList();
+    });
+    
+    if (mounted) {
+      setState(() {
+        _entries = convertedEntries;
+        _isLoading = false;
+      });
+    }
   }
 
   void _changeMonth(int delta) {
@@ -39,6 +66,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Dashboard')),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
     // Calculate daily totals for the current month
     final daysInMonth = DateTime(_focusedMonth.year, _focusedMonth.month + 1, 0).day;
     
@@ -49,7 +83,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     double totalTips = 0;
 
     // Process entries for this month
-    widget.entries.forEach((key, entryList) {
+    _entries.forEach((key, entryList) {
       final parts = key.split('-');
       final year = int.parse(parts[0]);
       final month = int.parse(parts[1]);
@@ -96,13 +130,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.calendar_today),
-            onPressed: () => Navigator.pop(context),
-            tooltip: 'Back to Calendar',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => HomeScreen(),
+                ),
+              );
+            },
+            tooltip: 'Go to Calendar',
           ),
         ],
       ),
       drawer: AppDrawer(
-        entries: widget.entries,
+        entries: _entries,
         focusedMonth: _focusedMonth,
         isFromDashboard: true,
       ),

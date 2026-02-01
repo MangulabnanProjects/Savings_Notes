@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../screens/dashboard_screen.dart';
+import '../screens/home_screen.dart';
 import '../screens/savings_history_screen.dart';
 import '../screens/tip_history_screen.dart';
 import '../screens/about_screen.dart';
@@ -54,7 +55,7 @@ class AppDrawer extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   const Text(
-                    'Savings & Tip',
+                    'PocketLog',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 20,
@@ -62,7 +63,7 @@ class AppDrawer extends StatelessWidget {
                     ),
                   ),
                   const Text(
-                    'Note Calendar',
+                    'Savings & Tips Tracker',
                     style: TextStyle(
                       color: Colors.white70,
                       fontSize: 14,
@@ -82,40 +83,31 @@ class AppDrawer extends StatelessWidget {
                     icon: Icons.dashboard,
                     title: 'Dashboard',
                     onTap: () {
-                      Navigator.pop(context);
-                      if (currentPage != 'dashboard') {
-                        if (currentPage != null && currentPage != 'calendar') {
-                          Navigator.pop(context);
-                        }
-                        if (!isFromDashboard) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DashboardScreen(
-                                entries: entries,
-                                focusedMonth: month,
-                              ),
-                            ),
-                          );
-                        }
-                      }
+                      Navigator.pop(context); // Close drawer
+                      // Pop all screens until we reach the first route (Dashboard)
+                      Navigator.popUntil(context, (route) => route.isFirst);
                     },
-                    isSelected: currentPage == 'dashboard' || isFromDashboard,
+                    isSelected: isFromDashboard && currentPage == null,
                   ),
                   _buildDrawerItem(
                     context,
                     icon: Icons.calendar_month,
                     title: 'Calendar',
                     onTap: () {
-                      Navigator.pop(context);
-                      if (currentPage != null && currentPage != 'calendar') {
-                        Navigator.pop(context);
-                      }
-                      if (isFromDashboard) {
-                        Navigator.pop(context);
-                      }
+                      Navigator.pop(context); // Close drawer
+                      // If already on calendar, do nothing
+                      if (currentPage == 'calendar') return;
+                      
+                      // Pop all and push calendar
+                      Navigator.popUntil(context, (route) => route.isFirst);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const HomeScreen(),
+                        ),
+                      );
                     },
-                    isSelected: currentPage == 'calendar' || (currentPage == null && !isFromDashboard),
+                    isSelected: currentPage == 'calendar',
                   ),
                   const Divider(color: Color(0xFFE8F5E9), thickness: 1),
                   _buildDrawerItem(
@@ -123,24 +115,20 @@ class AppDrawer extends StatelessWidget {
                     icon: Icons.savings,
                     title: 'Savings History',
                     onTap: () {
-                      Navigator.pop(context);
-                      if (currentPage != 'savings_history') {
-                        if (currentPage != null && currentPage != 'calendar') {
-                          Navigator.pop(context);
-                        }
-                        if (isFromDashboard) {
-                          Navigator.pop(context);
-                        }
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SavingsHistoryScreen(
-                              entries: entries,
-                              focusedMonth: month,
-                            ),
+                      Navigator.pop(context); // Close drawer
+                      if (currentPage == 'savings_history') return;
+                      
+                      // Pop all and push savings history
+                      Navigator.popUntil(context, (route) => route.isFirst);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SavingsHistoryScreen(
+                            entries: entries,
+                            focusedMonth: month,
                           ),
-                        );
-                      }
+                        ),
+                      );
                     },
                     isSelected: currentPage == 'savings_history',
                   ),
@@ -149,24 +137,20 @@ class AppDrawer extends StatelessWidget {
                     icon: Icons.attach_money,
                     title: 'Tip History',
                     onTap: () {
-                      Navigator.pop(context);
-                      if (currentPage != 'tip_history') {
-                        if (currentPage != null && currentPage != 'calendar') {
-                          Navigator.pop(context);
-                        }
-                        if (isFromDashboard) {
-                          Navigator.pop(context);
-                        }
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => TipHistoryScreen(
-                              entries: entries,
-                              focusedMonth: month,
-                            ),
+                      Navigator.pop(context); // Close drawer
+                      if (currentPage == 'tip_history') return;
+                      
+                      // Pop all and push tip history
+                      Navigator.popUntil(context, (route) => route.isFirst);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => TipHistoryScreen(
+                            entries: entries,
+                            focusedMonth: month,
                           ),
-                        );
-                      }
+                        ),
+                      );
                     },
                     isSelected: currentPage == 'tip_history',
                   ),
@@ -176,24 +160,20 @@ class AppDrawer extends StatelessWidget {
                     icon: Icons.info_outline,
                     title: 'About',
                     onTap: () {
-                      Navigator.pop(context);
-                      if (currentPage != 'about') {
-                        if (currentPage != null && currentPage != 'calendar') {
-                          Navigator.pop(context);
-                        }
-                        if (isFromDashboard) {
-                          Navigator.pop(context);
-                        }
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AboutScreen(
-                              entries: entries,
-                              focusedMonth: month,
-                            ),
+                      Navigator.pop(context); // Close drawer
+                      if (currentPage == 'about') return;
+                      
+                      // Pop all and push about
+                      Navigator.popUntil(context, (route) => route.isFirst);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AboutScreen(
+                            entries: entries,
+                            focusedMonth: month,
                           ),
-                        );
-                      }
+                        ),
+                      );
                     },
                     isSelected: currentPage == 'about',
                   ),
